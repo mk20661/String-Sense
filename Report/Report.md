@@ -28,21 +28,21 @@ This project system consists of a data processing platform, embedded hardware an
 
 ## Data
 The data sources used in this project consist of two parts: Firstly, the NSynth dataset released by Google Magenta is adopted, and three types of target string instrument audio samples (guitar, bass, and string) are selected; Secondly, real guitar scale audio samples are collected autonomously through the onboard microphone of the Arduino Nano 33 BLE Sense board as supplementary data to enhance the model's adaptability in real scenarios(see figure 3).
-<figure style="text-align: center;">
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/guitar.png" alt="MFE" width="200"/>
-        <figcaption>Figure 2a: Guitar</figcaption>
-    </div>
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/bass.png" alt="MFCC" width="200"/>
-        <figcaption>Figure 2b: Bass</figcaption>
-    </div>
-        <div style="display: inline-block; margin: 10px;">
-        <img src="./img/string.png" alt="MFCC" width="200"/>
-        <figcaption>Figure 2c: String</figcaption>
-    </div>
-    <figcaption><b>Figure 2:</b>  Instrument Audio</figcaption>
-</figure>
+<p align="center">
+        <img src="./img/guitar.png" alt="MFE" width="200"/><br/>
+        <b>Figure 2a:</b> Guitar
+</p>
+<p align="center">
+        <img src="./img/bass.png" alt="MFCC" width="200"/><br/>
+        <b>Figure 2b:</b>Bass
+</p>
+<p align="center">
+        <img src="./img/string.png" alt="MFCC" width="200"/><br/>
+        <b>Figure 2c:</b> String
+</p>
+<p align="center">
+<b>Figure 2:</b>  Instrument Audio
+</p>
 <p align="center">
   <img src="./img/data collect.jpg" alt="data collect" width="300"/><br/>
   <b>Figure 2:</b> Data Collect
@@ -73,42 +73,38 @@ This project has designed and conducted multiple sets of comparative experiments
 
 Firstly, two feature extraction methods for audio, MFE (Mel Filterbank Energy) and MFCC (Mel-Frequency Cepstral Coefficients), were attempted at the feature level. And the visualisation comparison of the extraction results was conducted using the Feature Explorer tool of the Edge Impulse platform. As shown in the figure 5, the MFE feature (see figure 5a) can preliminarily distinguish four types of musical instruments in the overall distribution. Still, the clustering boundaries are relatively vague, and many overlapping phenomena exist among some categories. In contrast, the MFCC feature (see figure 5b) forms a more transparent clustering structure among the four types of samples, especially showing higher separability in the guitar, bass, and string categories, indicating that MFCC is more suitable as the input feature of the model.
 
-<figure style="text-align: center;">
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/feature_MFE.png" alt="MFE" width="400"/>
-        <figcaption>Figure 5a: MFE</figcaption>
-    </div>
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/feature_MFCC.png" alt="MFCC" width="400"/>
-        <figcaption>Figure 5b: MFCC</figcaption>
-    </div>
-    <figcaption><b>Figure 5:</b>  Feature Extraction</figcaption>
-</figure>
+<p align="center">
+        <img src="./img/feature_MFE.png" alt="MFE" width="400"/></br>
+        <b>Figure 5a:</b> MFE
+</p>
+<p align="center">
+        <img src="./img/feature_MFCC.png" alt="MFCC" width="400"/></br>
+        <b>Figure 5b:</b> MFCC
+</p>
+<p align="center">
+   <b>Figure 5:</b>  Feature Extraction
+</p>
 In terms of window settings, considering that each audio sample in this project is an independent single-tone phase, the entire audio segment is input as a single window to the model. This avoids the truncation problem caused by sliding windows.
 
 On the validation set, the 1D CNN model achieves 97.5% accuracy (Figure 6), with an inference latency of 10ms and a model size of about 34.4KB, making it lightweight and suitable for latency-sensitive embedded applications. 2D CNN model further improves its accuracy to 100% (Figure 7), but the inference latency increases to 129ms and the model size to 43.9 KB. Although resource consumption increases slightly, classification performance is fully optimised.
-<figure style="text-align: center;">
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/classifier_1D.png" alt="1D_classifer" width="400"/>
-        <figcaption>Figure 6: 1D CNN Validation</figcaption>
-    </div>
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/classifer_2D.png" alt="2D_classifer" width="400"/>
-        <figcaption>Figure 7: 2D CNN Validation</figcaption>
-    </div>
-</figure>
+<p align="center">
+        <img src="./img/classifier_1D.png" alt="1D_classifer" width="400"/></br>
+        <b>Figure 6:</b> 1D CNN Validation
+</p>
+<p align="center">
+        <img src="./img/classifer_2D.png" alt="2D_classifer" width="400"/></br>
+        <b>Figure 7:</b> 2D CNN Validation
+</p>
 
 In the performance evaluation of the test set (refer to Figures 8 and 9), the 1D CNN model achieved an accuracy rate of 61.0% on the test set. In comparison, the accuracy rate of the 2D CNN model increased to 75.0%. Although both models can achieve high accuracy rates on the training and validation sets, the test set results further verified the superiority of the 2D CNN model: it has better generalisation ability. It can maintain higher classification accuracy on unseen data, while no obvious overfitting phenomenon was observed. Therefore, considering the model stability and actual deployment requirements comprehensively, the architecture based on 2D CNN was ultimately selected as the best solution for this project.
-<figure style="text-align: center;">
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/modelTesting_1D.png" alt="1D_model test" width="400"/>
-        <figcaption>Figure 8: 1D CNN Model Testing</figcaption>
-    </div>
-    <div style="display: inline-block; margin: 10px;">
-        <img src="./img/modelTesting_2D.png" alt="2D_model test" width="400"/>
-        <figcaption>Figure 9: 2D CNN Model Testing</figcaption>
-    </div>
-</figure>
+<p align="center">
+        <img src="./img/modelTesting_1D.png" alt="1D_model test" width="400"/></br>
+        <b>Figure 8: </b>1D CNN Model Testing
+</p>
+<p align="center">
+        <img src="./img/modelTesting_2D.png" alt="2D_model test" width="400"/></br>
+        <b>Figure 9:</b>1 2D CNN Model Testing
+</p>
 
 ## Results and Observations
 This project successfully constructed a string instrument classification system based on MFCC features and a 2D CNN model, which can be efficiently deployed on resource-constrained platforms such as Arduino Nano 33 BLE Sense. The final model achieved 100% accuracy on the validation set and 75% accuracy on the test set. The inference delay was 129ms, and the peak memory usage was 28.1KB, meeting the resource constraints requirements for embedded applications.
