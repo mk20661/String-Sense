@@ -4,7 +4,7 @@
 Hongbing Qiu
 ID： 24065411
 ```
-GitHub: https://github.com/mk20661/String-Sense
+GitHub: https://github.com/mk20661/String-Sense  
 EdgeImpulse: https://studio.edgeimpulse.com/public/678434/live 
 
 ## Introduction
