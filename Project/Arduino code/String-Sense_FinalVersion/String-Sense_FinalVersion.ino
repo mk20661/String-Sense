@@ -2,7 +2,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <String_Sense_inferencing.h> // Your new model
+#include <String_Sense_inferencing.h> // Your Edge Impulse model
 
 // OLED configuration
 #define SCREEN_WIDTH 128
@@ -25,13 +25,18 @@ static inference_t inference;
 static signed short sampleBuffer[2048];
 static bool debug_nn = false; // Set to true to debug features
 
+// Button control variables
+bool buttonPressed = false;
+unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 50; // 50ms debounce delay
+
 void setup()
 {
     Serial.begin(115200);
     while (!Serial);
     Serial.println("Edge Impulse Inference with OLED and Button");
 
-    // Initialize OLED
+    // Initialize OLED display
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
         Serial.println("OLED initialization failed");
         while (1);
@@ -62,8 +67,14 @@ void setup()
 
 void loop()
 {
-    // Check if the button is pressed
-    if (digitalRead(BUTTON_PIN) == HIGH) {
+    bool buttonState = (digitalRead(BUTTON_PIN) == HIGH); // LOW means pressed
+    unsigned long currentTime = millis();
+
+    // Detect button press with debounce
+    if (buttonState && !buttonPressed && (currentTime - lastDebounceTime) > debounceDelay) {
+        buttonPressed = true;
+        lastDebounceTime = currentTime;
+
         Serial.println("Button pressed, starting inference...");
 
         display.clearDisplay();
@@ -98,14 +109,14 @@ void loop()
             }
         }
 
-        // Output to serial monitor
+        // Output results to serial monitor
         Serial.print("Detected: ");
         Serial.print(max_label);
         Serial.print(" (");
         Serial.print(max_score * 100, 2);
         Serial.println("%)");
 
-        // Display on OLED
+        // Display results on OLED
         display.clearDisplay();
         display.setCursor(0, 0);
         display.setTextSize(1);
@@ -115,7 +126,10 @@ void loop()
         display.println(max_label);
         display.display();
 
-        delay(1000); // Simple debounce delay
+    } 
+    else if (!buttonState) {
+        // Allow next detection after button is released
+        buttonPressed = false;
     }
 }
 
@@ -159,7 +173,7 @@ static bool microphone_inference_start(uint32_t n_samples)
     return true;
 }
 
-// Wait for microphone data to be ready
+// Wait until microphone data is ready
 static bool microphone_inference_record(void)
 {
     inference.buf_ready = 0;
@@ -184,7 +198,7 @@ static void microphone_inference_end(void)
     free(inference.buffer);
 }
 
-// Ensure correct sensor model
+// Make sure the model matches the sensor type
 #if !defined(EI_CLASSIFIER_SENSOR) || EI_CLASSIFIER_SENSOR != EI_CLASSIFIER_SENSOR_MICROPHONE
 #error "Invalid model for current sensor."
 #endif
