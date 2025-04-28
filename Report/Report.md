@@ -26,26 +26,31 @@ This project explores how to accurately recognise and classify the sounds of var
 ## Application Overview
 This project system consists of a data processing platform, embedded hardware and interactive interface, forming a complete end-to-end audio recognition process. The data processing platform is based on Edge Impulse, completing audio sample collection, MFCC feature extraction and deep learning model training. It covers guitars, bass guitars, other stringed instruments and other categories (including non-stringed instruments and environmental noise), providing diverse training data for the model. In the feature extraction stage, Mel Frequency Cepstral Coefficients (MFCC) are used to capture the key perceptual features of audio, improving the classification accuracy. After training, the model is deployed in a quantised form to the Arduino Nano 33 BLE Sense microcontroller, supporting local inference in resource-constrained environments. The hardware part includes a microphone module (for real-time audio collection), physical buttons (for controlling the start of the recognition process) and an OLED display (for outputting inference results). After the button is triggered, the system collects audio and extracts features. It performs classification inference and then displays the recognition result (guitar/bass/string/other) in real time on the OLED screen in text form. The overall design focuses on low-power operation and independence, enabling stable and real-time local audio recognition applications without needing external servers or high-performance computing resources.
 
+<p align="center">
+  <img src="./img/application overview.png" alt="" width="400"/><br/>
+  <b>Figure 2:</b> Application Overview
+</p>
+
 ## Data
-The data sources used in this project consist of two parts: Firstly, the NSynth dataset released by Google Magenta is adopted, and three types of target string instrument audio samples (guitar, bass, and string) are selected; Secondly, real guitar scale audio samples are collected autonomously through the onboard microphone of the Arduino Nano 33 BLE Sense board as supplementary data to enhance the model's adaptability in real scenarios(see figure 3).
+The data sources used in this project consist of two parts: Firstly, the NSynth dataset released by Google Magenta is adopted, and three types of target string instrument audio samples (guitar, bass, and string) are selected; Secondly, real guitar scale audio samples are collected autonomously through the onboard microphone of the Arduino Nano 33 BLE Sense board as supplementary data to enhance the model's adaptability in real scenarios(see figure 4).
 <p align="center">
         <img src="./img/guitar.png" alt="MFE" width="200"/><br/>
-        <b>Figure 2a:</b> Guitar
+        <b>Figure 3a:</b> Guitar
 </p>
 <p align="center">
         <img src="./img/bass.png" alt="MFCC" width="200"/><br/>
-        <b>Figure 2b:</b>Bass
+        <b>Figure 3b:</b>Bass
 </p>
 <p align="center">
         <img src="./img/string.png" alt="MFCC" width="200"/><br/>
-        <b>Figure 2c:</b> String
+        <b>Figure 3c:</b> String
 </p>
 <p align="center">
-<b>Figure 2:</b>  Instrument Audio
+<b>Figure 3:</b>  Instrument Audio
 </p>
 <p align="center">
   <img src="./img/data collect.jpg" alt="data collect" width="300"/><br/>
-  <b>Figure 2:</b> Data Collect
+  <b>Figure 4:</b> Data Collect
 </p>
 
 To enhance the model's classification ability and generalisation performance, the "other" category is introduced, which includes non-string instrument samples randomly selected from the NSynth dataset (such as brass, reed, keyboard, etc.), to construct a more challenging four-class classification task.
@@ -59,11 +64,11 @@ In terms of data partitioning, each category (guitar, bass, string, other) in th
 
 This project is based on the Edge Impulse platform. It builds a lightweight one-dimensional convolutional neural network (2D CNN) for audio classification tasks, aiming to identify four categories of sounds: guitar, bass, string, and other. The input data consists of extracted MFCC (Mel-Frequency Cepstral Coefficients) features, with extraction parameters set as follows: 13 coefficients, a frame length and frame shift of 0.02 seconds, 32 Mel filters, an FFT length of 256, and a frequency range of 0–8000 Hz.
 
-The model architecture(see figure 4) includes an input layer (2600-dimensional features) that, after a Reshape operation, passes through two successive 2D convolution and pooling modules. The first convolutional layer uses 8 filters with a kernel size of 3×1, while the second uses 16 filters with the same kernel size. Each convolutional block is followed by a Dropout layer with a rate of 0.25 to mitigate the risk of overfitting. The extracted features are then flattened followed by an output layer that completes the four-class classification.
+The model architecture(see figure 5) includes an input layer (2600-dimensional features) that, after a Reshape operation, passes through two successive 2D convolution and pooling modules. The first convolutional layer uses 8 filters with a kernel size of 3×1, while the second uses 16 filters with the same kernel size. Each convolutional block is followed by a Dropout layer with a rate of 0.25 to mitigate the risk of overfitting. The extracted features are then flattened followed by an output layer that completes the four-class classification.
 
 <p align="center">
   <img src="./img/model.png" alt="architecture" width="300"/><br/>
-  <b>Figure 4:</b> Model Architecture
+  <b>Figure 5:</b> Model Architecture
 </p>
 
 During the model design process, attempts were made to adjust the number of convolutional layers and the quantity of convolutional kernels to further enhance the feature extraction capability. Experimental results indicated that increasing the depth or width of the network did indeed lead to higher accuracy on the training set, but it also resulted in a significant increase in inference latency, an increase in model resource occupation, and some configurations exceeding the load range of embedded devices. Considering the classification performance, inference speed, and resource occupation, this project ultimately selected a lightweight architecture based on 2D CNN. This architecture ensures low latency and reasonable model size while fully leveraging the advantages of two-dimensional convolution in time-frequency feature extraction, improving classification accuracy and overall system performance, and is suitable for efficient deployment and operation on edge devices.
@@ -71,39 +76,39 @@ During the model design process, attempts were made to adjust the number of conv
 ## Experiments
 This project has designed and conducted multiple sets of comparative experiments in multiple aspects, including feature extraction methods, window settings, and model architectures, to enhance the model's recognition performance in embedded scenarios.
 
-Firstly, two feature extraction methods for audio, MFE (Mel Filterbank Energy) and MFCC (Mel-Frequency Cepstral Coefficients), were attempted at the feature level. And the visualisation comparison of the extraction results was conducted using the Feature Explorer tool of the Edge Impulse platform. As shown in the figure 5, the MFE feature (see figure 5a) can preliminarily distinguish four types of musical instruments in the overall distribution. Still, the clustering boundaries are relatively vague, and many overlapping phenomena exist among some categories. In contrast, the MFCC feature (see figure 5b) forms a more transparent clustering structure among the four types of samples, especially showing higher separability in the guitar, bass, and string categories, indicating that MFCC is more suitable as the input feature of the model.
+Firstly, two feature extraction methods for audio, MFE (Mel Filterbank Energy) and MFCC (Mel-Frequency Cepstral Coefficients), were attempted at the feature level. And the visualisation comparison of the extraction results was conducted using the Feature Explorer tool of the Edge Impulse platform. As shown in the figure 6, the MFE feature (see figure 6a) can preliminarily distinguish four types of musical instruments in the overall distribution. Still, the clustering boundaries are relatively vague, and many overlapping phenomena exist among some categories. In contrast, the MFCC feature (see figure 6b) forms a more transparent clustering structure among the four types of samples, especially showing higher separability in the guitar, bass, and string categories, indicating that MFCC is more suitable as the input feature of the model.
 
 <p align="center">
         <img src="./img/feature_MFE.png" alt="MFE" width="400"/></br>
-        <b>Figure 5a:</b> MFE
+        <b>Figure 6a:</b> MFE
 </p>
 <p align="center">
         <img src="./img/feature_MFCC.png" alt="MFCC" width="400"/></br>
-        <b>Figure 5b:</b> MFCC
+        <b>Figure 6b:</b> MFCC
 </p>
 <p align="center">
-   <b>Figure 5:</b>  Feature Extraction
+   <b>Figure 6:</b>  Feature Extraction
 </p>
 In terms of window settings, considering that each audio sample in this project is an independent single-tone phase, the entire audio segment is input as a single window to the model. This avoids the truncation problem caused by sliding windows.
 
-On the validation set, the 1D CNN model achieves 97.5% accuracy (Figure 6), with an inference latency of 10ms and a model size of about 34.4KB, making it lightweight and suitable for latency-sensitive embedded applications. 2D CNN model further improves its accuracy to 100% (Figure 7), but the inference latency increases to 129ms and the model size to 43.9 KB. Although resource consumption increases slightly, classification performance is fully optimised.
+On the validation set, the 1D CNN model achieves 97.5% accuracy (Figure 7), with an inference latency of 10ms and a model size of about 34.4KB, making it lightweight and suitable for latency-sensitive embedded applications. 2D CNN model further improves its accuracy to 100% (Figure 8), but the inference latency increases to 129ms and the model size to 43.9 KB. Although resource consumption increases slightly, classification performance is fully optimised.
 <p align="center">
         <img src="./img/classifier_1D.png" alt="1D_classifer" width="400"/></br>
-        <b>Figure 6:</b> 1D CNN Validation
+        <b>Figure 7:</b> 1D CNN Validation
 </p>
 <p align="center">
         <img src="./img/classifer_2D.png" alt="2D_classifer" width="400"/></br>
-        <b>Figure 7:</b> 2D CNN Validation
+        <b>Figure 8:</b> 2D CNN Validation
 </p>
 
-In the performance evaluation of the test set (refer to Figures 8 and 9), the 1D CNN model achieved an accuracy rate of 61.0% on the test set. In comparison, the accuracy rate of the 2D CNN model increased to 75.0%. Although both models can achieve high accuracy rates on the training and validation sets, the test set results further verified the superiority of the 2D CNN model: it has better generalisation ability. It can maintain higher classification accuracy on unseen data, while no obvious overfitting phenomenon was observed. Therefore, considering the model stability and actual deployment requirements comprehensively, the architecture based on 2D CNN was ultimately selected as the best solution for this project.
+In the performance evaluation of the test set (See figures 9 and 10), the 1D CNN model achieved an accuracy rate of 61.0% on the test set. In comparison, the accuracy rate of the 2D CNN model increased to 75.0%. Although both models can achieve high accuracy rates on the training and validation sets, the test set results further verified the superiority of the 2D CNN model: it has better generalisation ability. It can maintain higher classification accuracy on unseen data, while no obvious overfitting phenomenon was observed. Therefore, considering the model stability and actual deployment requirements comprehensively, the architecture based on 2D CNN was ultimately selected as the best solution for this project.
 <p align="center">
         <img src="./img/modelTesting_1D.png" alt="1D_model test" width="400"/></br>
-        <b>Figure 8: </b>1D CNN Model Testing
+        <b>Figure 9: </b>1D CNN Model Testing
 </p>
 <p align="center">
         <img src="./img/modelTesting_2D.png" alt="2D_model test" width="400"/></br>
-        <b>Figure 9:</b>1 2D CNN Model Testing
+        <b>Figure 10:</b>1 2D CNN Model Testing
 </p>
 
 ## Results and Observations
