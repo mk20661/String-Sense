@@ -75,7 +75,7 @@ It employs **MFCC feature extraction** and a lightweight **2D Convolutional Neur
 2. Connect the Arduino Nano 33 BLE Sense via USB
 3. Upload the Arduino sketch:
    ```bash
-   ./Project/Arduino code/String-Sense_FinalVersion/String-Sense_FinalVersion.ino
+   ./Project/final project/Arduino code/String-Sense_FinalVersion/String-Sense_FinalVersion.ino
 ### ▶️ Method 1: Deploy on Arduino Nano 33 BLE Sense
 1. Scan the following QR code:
 <p align="center"> <img src="./READMESrc/img/QRcode.png" width="300"/><br/> <b>Figure 3:</b> Mobile Deployment QR Code
